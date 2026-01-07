@@ -1,0 +1,49 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:best-practices"
+  ],
+  "prConcurrentLimit": 0,
+  "prHourlyLimit": 0,
+  "packageRules": [
+    {
+      "description": "Auto-merge all minor, patch, pin, and digest updates",
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "pin",
+        "digest"
+      ],
+      "automerge": true
+    }
+  ],
+  "customManagers": [
+    {
+      "description": "Update Tor version in Dockerfile",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^Dockerfile$/"
+      ],
+      "matchStrings": [
+        "ARG TOR_VERSION=\"(?<currentValue>.*?)\""
+      ],
+      "datasourceTemplate": "git-tags",
+      "depNameTemplate": "https://gitlab.torproject.org/tpo/core/tor.git",
+      "versioningTemplate": "semver"
+    },
+    {
+      "description": "Update Lyrebird version in Dockerfile",
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^Dockerfile$/"
+      ],
+      "matchStrings": [
+        "ARG LYREBIRD_VERSION=\"(?<currentValue>.*?)\""
+      ],
+      "datasourceTemplate": "gitlab-tags",
+      "depNameTemplate": "tpo/anti-censorship/pluggable-transports/lyrebird",
+      "registryUrlTemplate": "https://gitlab.torproject.org",
+      "extractVersionTemplate": "^lyrebird-(?<version>.*)$"
+    }
+  ]
+}
