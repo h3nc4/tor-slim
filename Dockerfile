@@ -21,7 +21,7 @@ ARG LYREBIRD_VERSION="0.8.1"
 
 ################################################################################
 # Lyrebird Builder
-FROM golang:1.25.5-alpine3.23@sha256:ac09a5f469f307e5da71e766b0bd59c9c49ea460a528cc3e6686513d64a6f1fb AS lyrebird-builder
+FROM golang:1.25.6-alpine3.23@sha256:bc2596742c7a01aa8c520a075515c7fee21024b05bfaa18bd674fe82c100a05d AS lyrebird-builder
 ARG LYREBIRD_VERSION
 
 RUN apk add --no-cache git
