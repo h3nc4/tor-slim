@@ -17,21 +17,6 @@
 ########################################
 # Versions
 ARG TOR_VERSION="0.4.8.21"
-ARG LYREBIRD_VERSION="0.8.1"
-
-################################################################################
-# Lyrebird Builder
-FROM golang:1.25.6-alpine3.23@sha256:d9b2e14101f27ec8d09674cd01186798d227bb0daec90e032aeb1cd22ac0f029 AS lyrebird-builder
-ARG LYREBIRD_VERSION
-
-RUN apk add --no-cache git
-
-WORKDIR /src
-RUN git clone --depth 1 --branch "lyrebird-${LYREBIRD_VERSION}" \
-  https://gitlab.torproject.org/tpo/anti-censorship/pluggable-transports/lyrebird.git .
-
-# Build statically
-RUN CGO_ENABLED=0 go build -v -ldflags="-s -w" -o /bin/lyrebird ./cmd/lyrebird
 
 ################################################################################
 # Tor Builder
@@ -86,28 +71,17 @@ RUN make -j"$(nproc)" && \
   strip --strip-all src/app/tor
 
 # Setup directories and folder permissions
-RUN mkdir -p /tmp/var/lib/tor /tmp/etc/tor && \
-  chmod 700 /tmp/var/lib/tor
+RUN mkdir -p /rootfs/var/lib/tor /rootfs/etc/tor && \
+  mv src/app/tor /rootfs/tor && \
+  chmod 700 /rootfs/var/lib/tor
 
-RUN printf "SocksPort 0.0.0.0:9050\nDataDirectory /var/lib/tor\nLog notice stdout\n" >/tmp/etc/tor/torrc
-
-################################################################################
-# Assemble runtime image
-FROM scratch AS assemble
-
-# Binaries
-COPY --from=tor-builder /src/src/app/tor /tor
-COPY --from=lyrebird-builder /bin/lyrebird /lyrebird
-
-# Config and data directories
-COPY --from=tor-builder --chown=65534:65534 /tmp/var/lib/tor /var/lib/tor
-COPY --from=tor-builder /tmp/etc/tor /etc/tor
+RUN printf "SocksPort 0.0.0.0:9050\nDataDirectory /var/lib/tor\nLog notice stdout\n" >/rootfs/etc/tor/torrc
 
 ################################################################################
 # Final squashed image
 FROM scratch AS final
 
-COPY --from=assemble "/" "/"
+COPY --from=tor-builder /rootfs/ /
 
 USER 65534:65534
 
