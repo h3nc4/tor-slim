@@ -73,6 +73,7 @@ RUN make -j"$(nproc)" && \
 # Setup directories and folder permissions
 RUN mkdir -p /rootfs/var/lib/tor /rootfs/etc/tor && \
   mv src/app/tor /rootfs/tor && \
+  chown 65534:65534 /rootfs/var/lib/tor && \
   chmod 700 /rootfs/var/lib/tor
 
 RUN printf "SocksPort 0.0.0.0:9050\nDataDirectory /var/lib/tor\nLog notice stdout\n" >/rootfs/etc/tor/torrc
