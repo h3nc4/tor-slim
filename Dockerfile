@@ -71,12 +71,12 @@ RUN make -j"$(nproc)" && \
   strip --strip-all src/app/tor
 
 # Setup directories and folder permissions
-RUN mkdir -p /rootfs/var/lib/tor /rootfs/etc/tor && \
+RUN mkdir -p /rootfs/var/lib/tor /rootfs/etc/tor/torrc.d && \
   mv src/app/tor /rootfs/tor && \
   chown 65534:65534 /rootfs/var/lib/tor && \
   chmod 700 /rootfs/var/lib/tor
 
-RUN printf "SocksPort 0.0.0.0:9050\nDataDirectory /var/lib/tor\nLog notice stdout\n" >/rootfs/etc/tor/torrc
+RUN printf "SocksPort 0.0.0.0:9050\nDataDirectory /var/lib/tor\nLog notice stdout\n%%include /etc/tor/torrc.d/*.conf\n" >/rootfs/etc/tor/torrc
 
 ################################################################################
 # Final squashed image
