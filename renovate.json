@@ -9,6 +9,7 @@
     {
       "description": "Auto-merge all minor, patch, pin, and digest updates",
       "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "addLabels": ["automerge"],
       "automerge": true
     }
   ],
