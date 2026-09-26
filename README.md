@@ -1,8 +1,8 @@
-# Slim Tor Container
+# Tor Slim
 
-Docker container for Tor (**<30MB**), built as one statically-linked binary with no OS layer.
+Docker image for Tor, under 30 MB, built as one statically linked binary on `FROM scratch`.
 
-**Why use this?** This Image runs Tor in a `FROM scratch` environment with no package manager, shell, or system libraries. This eliminates the entire OS attack surface.
+The image contains the tor binary and its configuration. Nothing else is present, not a package manager, a shell or any system library, which leaves a process that escapes tor without tooling to reuse. The kernel, tor itself and the libraries linked into it all remain reachable, so this narrows the attack surface rather than removing it.
 
 ## Running
 
@@ -33,11 +33,13 @@ docker run -d --name tor -p 9050:9050 \
   h3nc4/tor-slim
 ```
 
-A bare directory path errors when `torrc.d` is empty or absent, while the glob does not, so the image still starts with no drop-ins mounted. To replace the configuration wholesale instead, mount over `/etc/tor/torrc`.
+A bare directory path errors when `torrc.d` is empty or absent. The glob tolerates both, which is what lets the image start with nothing mounted there. To replace the configuration wholesale instead, mount over `/etc/tor/torrc`.
 
 `torrc.d` is root-owned and read-only to tor (UID 65534). `/var/lib/tor` is the data directory, owned by 65534 with mode 0700 as tor requires.
 
 ## License
+
+<!-- vale off -->
 
 Tor Slim is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
